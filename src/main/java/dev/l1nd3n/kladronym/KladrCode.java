@@ -17,6 +17,15 @@ public final class KladrCode {
         this.lc = lc;
     }
 
+    public KladrCode(String kladrCode) {
+        this(
+            Integer.parseInt(kladrCode,0,2,10),
+            Integer.parseInt(kladrCode,2,5,10),
+            Integer.parseInt(kladrCode,5,8,10),
+            Integer.parseInt(kladrCode,8,11,10)
+        );
+    }
+
     public KladrRank rank() {
         if (lc > 0) return KladrRank.LOCALITY;
         if (cc > 0) return KladrRank.CITY;

@@ -41,12 +41,7 @@ final class LoadedKladr {
             ));
         return new Kladronym(
             new Toponym(columns[0], abbreviation),
-            new KladrCode(
-                Integer.parseInt(columns[2],0,2,10),
-                Integer.parseInt(columns[2],2,5,10),
-                Integer.parseInt(columns[2],5,8,10),
-                Integer.parseInt(columns[2],8,11,10)
-            )
+            new KladrCode(columns[2])
         );
     }
 

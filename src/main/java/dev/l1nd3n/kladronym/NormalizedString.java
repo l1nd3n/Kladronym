@@ -8,10 +8,6 @@ final class NormalizedString {
     }
 
     String get() {
-        return normalize();
-    }
-
-    private String normalize() {
         StringBuilder result = new StringBuilder(source.length());
         boolean separator = true;
         for (int offset = 0; offset < source.length();) {

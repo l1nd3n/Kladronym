@@ -10,10 +10,6 @@ final class LexedAddress {
     }
 
     List<String> get() {
-        return lex();
-    }
-
-    private List<String> lex() {
         String normalized = address.get();
         if (normalized.isEmpty()) return List.of();
         return List.of(normalized.split(" "));

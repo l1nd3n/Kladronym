@@ -12,19 +12,15 @@ final class PreprocessedAddress {
     }
 
     List<Token> get() {
-        return preprocess();
-    }
-
-    private List<Token> preprocess() {
         NormalizedString normalized = new NormalizedString(source);
         LexedAddress lexed = new LexedAddress(normalized);
         CanonicalizedAddress canonicalized = new CanonicalizedAddress(
-            lexed,
-            socrbase.aliases()
+                lexed,
+                socrbase.aliases()
         );
         TokenizedAddress tokenized = new TokenizedAddress(
-            canonicalized,
-            socrbase.abbreviations()
+                canonicalized,
+                socrbase.abbreviations()
         );
         return tokenized.get();
     }

@@ -12,18 +12,14 @@ final class TokenizedAddress {
     }
 
     List<Token> get() {
-        return tokenize();
-    }
-
-    private List<Token> tokenize() {
         return address.get().stream()
             .map(lexeme -> abbreviations.find(lexeme)
-                .map(abbreviation -> new Token(
-                    TokenType.ABBREVIATION,
-                    lexeme,
-                    abbreviation
-                ))
-                .orElseGet(() -> new Token(TokenType.TEXT, lexeme, null)))
+                    .map(abbreviation -> new Token(
+                            TokenType.ABBREVIATION,
+                            lexeme,
+                            abbreviation
+                    ))
+                    .orElseGet(() -> new Token(TokenType.TEXT, lexeme, null)))
             .toList();
     }
 }
