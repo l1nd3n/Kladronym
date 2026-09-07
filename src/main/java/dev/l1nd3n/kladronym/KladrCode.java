@@ -1,5 +1,7 @@
 package dev.l1nd3n.kladronym;
 
+import java.util.Objects;
+
 public final class KladrCode {
     public static final KladrCode ROOT = new KladrCode(0,0,0,0);
 
@@ -13,14 +15,6 @@ public final class KladrCode {
         this.dc = dc;
         this.cc = cc;
         this.lc = lc;
-    }
-
-    public static KladrCode parse(String value) {
-        int rc = Integer.parseInt(value, 0, 2, 10);
-        int dc = Integer.parseInt(value, 2, 5, 10);
-        int cc = Integer.parseInt(value, 5, 8, 10);
-        int lc = Integer.parseInt(value, 8, 11, 10);
-        return new KladrCode(rc,dc,cc,lc);
     }
 
     public KladrRank rank() {
@@ -53,6 +47,18 @@ public final class KladrCode {
             case CITY -> rc == other.rc && dc == other.dc && cc == other.cc;
             case LOCALITY -> false;
         };
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof KladrCode code)) return false;
+        return rc == code.rc && dc == code.dc && cc == code.cc && lc == code.lc;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rc,dc,cc,lc);
     }
 
     @Override
