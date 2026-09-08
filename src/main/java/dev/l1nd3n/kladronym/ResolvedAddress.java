@@ -29,6 +29,22 @@ public final class ResolvedAddress {
         Socrbase loadedSocrbase = socrbase.get();
         KladrCatalog catalog = kladr.get();
         List<Token> tokens = new PreprocessedAddress(source, loadedSocrbase).get();
+        Optional<Kladronym> result = resolve(tokens,catalog,nameMatch,false);
+        if (result.isPresent()) return result;
+        return resolve(
+            tokens.reversed(),
+            catalog,
+            new ReversedNameMatch(nameMatch),
+            true
+        );
+    }
+
+    private Optional<Kladronym> resolve(
+        List<Token> tokens,
+        KladrCatalog catalog,
+        ToponymNameMatch nameMatch,
+        boolean reversed
+    ) {
         int index = 0;
         KladrCode scope = KladrCode.ROOT;
         Kladronym result = null;
@@ -68,7 +84,7 @@ public final class ResolvedAddress {
             }
             boolean consumed = false;
             while (!consumed) {
-                List<String> extendedName = extend(name, token.value());
+                List<String> extendedName = extend(name,token.value(),reversed);
                 Toponym toponym = expectedType == null
                     ? new Toponym(String.join(" ", extendedName))
                     : new Toponym(String.join(" ", extendedName), expectedType);
@@ -84,6 +100,7 @@ public final class ResolvedAddress {
                     name = List.of();
                     candidates = List.of();
                 } else {
+                    expectedType = null;
                     consumed = true;
                 }
             }
@@ -93,10 +110,11 @@ public final class ResolvedAddress {
         return Optional.ofNullable(result);
     }
 
-    private static List<String> extend(List<String> name, String word) {
+    private static List<String> extend(List<String> name,String word,boolean reversed) {
         List<String> result = new ArrayList<>(name.size() + 1);
+        if (reversed) result.add(word);
         result.addAll(name);
-        result.add(word);
+        if (!reversed) result.add(word);
         return List.copyOf(result);
     }
 

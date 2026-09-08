@@ -13,6 +13,7 @@ final class NormalizedString {
         for (int offset = 0; offset < source.length();) {
             int character = source.codePointAt(offset);
             offset += Character.charCount(character);
+            if (character == '-') continue;
             if (Character.isLetterOrDigit(character)) {
                 int lowercase = Character.toLowerCase(character);
                 result.appendCodePoint(lowercase == 'ё' ? 'е' : lowercase);
