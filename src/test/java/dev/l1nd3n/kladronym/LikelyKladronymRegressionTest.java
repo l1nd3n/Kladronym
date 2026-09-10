@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-final class ResolvedAddressRegressionTest {
+final class LikelyKladronymRegressionTest {
     private static final String RESOURCE_ROOT = "/dev/l1nd3n/kladronym/";
 
     @Test
@@ -28,7 +28,7 @@ final class ResolvedAddressRegressionTest {
         List<String> result = new ArrayList<>();
         result.add("address\ttoponym\tcode");
         for (String address : addresses) {
-            Kladronym kladronym = new ResolvedAddress(address).get().orElse(null);
+            Kladronym kladronym = new LikelyKladronym(address).get().orElse(null);
             String toponym = kladronym == null ? "" : kladronym.toponym().toString();
             String code = kladronym == null ? "" : kladronym.code().toString();
             result.add("%s\t%s\t%s".formatted(address, toponym, code));
@@ -38,7 +38,7 @@ final class ResolvedAddressRegressionTest {
 
     private static List<String> resourceLines(String name) throws Exception {
         String resource = RESOURCE_ROOT + name;
-        InputStream stream = ResolvedAddressRegressionTest.class.getResourceAsStream(resource);
+        InputStream stream = LikelyKladronymRegressionTest.class.getResourceAsStream(resource);
         if (stream == null) throw new AssertionError("Resource not found: " + resource);
         try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(stream, StandardCharsets.UTF_8)

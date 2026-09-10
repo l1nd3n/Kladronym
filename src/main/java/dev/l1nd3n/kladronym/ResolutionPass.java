@@ -1,55 +1,38 @@
 package dev.l1nd3n.kladronym;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
-public final class ResolvedAddress {
-    private final String source;
-    private final LoadedSocrbase socrbase;
-    private final LoadedKladr kladr;
+final class ResolutionPass {
+    private final List<Token> tokens;
+    private final KladrCatalog catalog;
     private final ToponymNameMatch nameMatch;
 
-    public ResolvedAddress(String source) {
-        this(source, BundledData.NAME_MATCH, BundledData.SOCRBASE, BundledData.KLADR);
-    }
-
-    public ResolvedAddress(String source, ToponymNameMatch nameMatch) {
-        this(source, nameMatch, BundledData.SOCRBASE, BundledData.KLADR);
-    }
-
-    private ResolvedAddress(String source, ToponymNameMatch nameMatch, LoadedSocrbase socrbase, LoadedKladr kladr) {
-        this.source = source;
+    ResolutionPass(List<Token> tokens, KladrCatalog catalog, ToponymNameMatch nameMatch) {
+        this.tokens = tokens;
+        this.catalog = catalog;
         this.nameMatch = nameMatch;
-        this.socrbase = socrbase;
-        this.kladr = kladr;
     }
 
-    public Optional<Kladronym> get() {
-        Socrbase loadedSocrbase = socrbase.get();
-        KladrCatalog catalog = kladr.get();
-        List<Token> tokens = new PreprocessedAddress(source, loadedSocrbase).get();
-        Optional<Kladronym> result = resolve(tokens,catalog,nameMatch,false);
-        if (result.isPresent()) return result;
-        return resolve(
-            tokens.reversed(),
-            catalog,
-            new ReversedNameMatch(nameMatch),
-            true
-        );
+    Optional<Kladronym> frontwards() {
+        return resolve(tokens, nameMatch, ExtendedName::frontwards);
+    }
+
+    Optional<Kladronym> backwards() {
+        return resolve(tokens.reversed(), new ReversedNameMatch(nameMatch), ExtendedName::backwards);
     }
 
     private Optional<Kladronym> resolve(
         List<Token> tokens,
-        KladrCatalog catalog,
         ToponymNameMatch nameMatch,
-        boolean reversed
+        Function<ExtendedName, String> extendName
     ) {
         int index = 0;
         KladrCode scope = KladrCode.ROOT;
         Kladronym result = null;
         Abbreviation expectedType = null;
-        List<String> name = List.of();
+        String name = "";
         List<Kladronym> candidates = List.of();
         while (index < tokens.size()) {
             Token token = tokens.get(index);
@@ -60,11 +43,11 @@ public final class ResolvedAddress {
                     result = candidates.getFirst();
                     scope = result.code();
                     expectedType = token.abbreviation();
-                    name = List.of();
+                    name = "";
                     candidates = List.of();
                 } else {
                     List<Kladronym> typed = catalog.find(
-                        new Toponym(String.join(" ", name), token.abbreviation()),
+                        new Toponym(name, token.abbreviation()),
                         scope,
                         nameMatch
                     );
@@ -76,7 +59,7 @@ public final class ResolvedAddress {
                         expectedType = null;
                     }
                     scope = result.code();
-                    name = List.of();
+                    name = "";
                     candidates = List.of();
                 }
                 index++;
@@ -84,10 +67,11 @@ public final class ResolvedAddress {
             }
             boolean consumed = false;
             while (!consumed) {
-                List<String> extendedName = extend(name,token.value(),reversed);
+                ExtendedName extension = new ExtendedName(name, token.value());
+                String extendedName = extendName.apply(extension);
                 Toponym toponym = expectedType == null
-                    ? new Toponym(String.join(" ", extendedName))
-                    : new Toponym(String.join(" ", extendedName), expectedType);
+                    ? new Toponym(extendedName)
+                    : new Toponym(extendedName, expectedType);
                 List<Kladronym> matched = catalog.find(toponym, scope, nameMatch);
                 if (!matched.isEmpty()) {
                     name = extendedName;
@@ -97,7 +81,7 @@ public final class ResolvedAddress {
                     result = candidates.getFirst();
                     scope = result.code();
                     expectedType = null;
-                    name = List.of();
+                    name = "";
                     candidates = List.of();
                 } else {
                     expectedType = null;
@@ -109,13 +93,4 @@ public final class ResolvedAddress {
         if (!candidates.isEmpty()) result = candidates.getFirst();
         return Optional.ofNullable(result);
     }
-
-    private static List<String> extend(List<String> name,String word,boolean reversed) {
-        List<String> result = new ArrayList<>(name.size() + 1);
-        if (reversed) result.add(word);
-        result.addAll(name);
-        if (!reversed) result.add(word);
-        return List.copyOf(result);
-    }
-
 }

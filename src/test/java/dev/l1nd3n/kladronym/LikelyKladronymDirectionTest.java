@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-final class ResolvedAddressDirectionTest {
+final class LikelyKladronymDirectionTest {
     @Test
     void resetsUnmatchedAbbreviation() {
         Map<String, String> addresses = Map.of(
@@ -18,7 +18,7 @@ final class ResolvedAddressDirectionTest {
         );
         addresses.forEach((address, expected) -> assertEquals(
             expected,
-            new ResolvedAddress(address).get().orElseThrow().code().toString(),
+            new LikelyKladronym(address).get().orElseThrow().code().toString(),
             address
         ));
     }
@@ -28,11 +28,11 @@ final class ResolvedAddressDirectionTest {
         String address = "Богданово д, Рамонский район, Воронежская область, Россия";
         assertEquals(
             "36026000000",
-            new ResolvedAddress(address).get().orElseThrow().code().toString()
+            new LikelyKladronym(address).get().orElseThrow().code().toString()
         );
         assertEquals(
             "52001000000",
-            new ResolvedAddress("Новгород г, Нижегородская область, Россия")
+            new LikelyKladronym("Новгород г, Нижегородская область, Россия")
                 .get()
                 .orElseThrow()
                 .code()
