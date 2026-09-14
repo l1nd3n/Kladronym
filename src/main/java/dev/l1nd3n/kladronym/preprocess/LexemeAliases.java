@@ -1,18 +1,18 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class LexemeAliases {
+public final class LexemeAliases {
     private final Node root;
 
     private LexemeAliases(Node root) {
         this.root = root;
     }
 
-    List<String> replace(List<String> lexemes) {
+    public List<String> replace(List<String> lexemes) {
         List<String> result = new ArrayList<>();
         int offset = 0;
         while (offset < lexemes.size()) {
@@ -28,7 +28,7 @@ final class LexemeAliases {
         return List.copyOf(result);
     }
 
-    static LexemeAliases create(Map<String, Abbreviation> abbreviations) {
+    public static LexemeAliases create(Map<String, Abbreviation> abbreviations) {
         Node root = new Node(Map.of(), null);
         for (Map.Entry<String, Abbreviation> entry : abbreviations.entrySet()) {
             List<String> lexemes = lexemes(entry.getKey());

@@ -1,17 +1,17 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
 import java.util.List;
 
-final class TokenizedAddress {
+public final class TokenizedAddress {
     private final CanonicalizedAddress address;
     private final AbbreviationCatalog abbreviations;
 
-    TokenizedAddress(CanonicalizedAddress address, AbbreviationCatalog abbreviations) {
+    public TokenizedAddress(CanonicalizedAddress address, AbbreviationCatalog abbreviations) {
         this.address = address;
         this.abbreviations = abbreviations;
     }
 
-    List<Token> get() {
+    public List<Token> get() {
         return address.get().stream()
             .map(lexeme -> abbreviations.find(lexeme)
                     .map(abbreviation -> new Token(

@@ -1,17 +1,17 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
 import java.util.List;
 
-final class CanonicalizedAddress {
+public final class CanonicalizedAddress {
     private final LexedAddress address;
     private final LexemeAliases aliases;
 
-    CanonicalizedAddress(LexedAddress address, LexemeAliases aliases) {
+    public CanonicalizedAddress(LexedAddress address, LexemeAliases aliases) {
         this.address = address;
         this.aliases = aliases;
     }
 
-    List<String> get() {
+    public List<String> get() {
         return aliases.replace(address.get());
     }
 }

@@ -18,7 +18,7 @@ final class LikelyKladronymDirectionTest {
         );
         addresses.forEach((address, expected) -> assertEquals(
             expected,
-            new LikelyKladronym(address).get().orElseThrow().code().toString(),
+            new LikelyKladronym(address).find().orElseThrow().code().toString(),
             address
         ));
     }
@@ -28,12 +28,12 @@ final class LikelyKladronymDirectionTest {
         String address = "Богданово д, Рамонский район, Воронежская область, Россия";
         assertEquals(
             "36026000000",
-            new LikelyKladronym(address).get().orElseThrow().code().toString()
+            new LikelyKladronym(address).find().orElseThrow().code().toString()
         );
         assertEquals(
             "52001000000",
             new LikelyKladronym("Новгород г, Нижегородская область, Россия")
-                .get()
+                .find()
                 .orElseThrow()
                 .code()
                 .toString()

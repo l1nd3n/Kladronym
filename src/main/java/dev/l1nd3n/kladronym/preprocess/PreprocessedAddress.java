@@ -1,17 +1,17 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
 import java.util.List;
 
-final class PreprocessedAddress {
+public final class PreprocessedAddress {
     private final String source;
     private final Socrbase socrbase;
 
-    PreprocessedAddress(String source, Socrbase socrbase) {
+    public PreprocessedAddress(String source, Socrbase socrbase) {
         this.source = source;
         this.socrbase = socrbase;
     }
 
-    List<Token> get() {
+    public List<Token> get() {
         NormalizedString normalized = new NormalizedString(source);
         LexedAddress lexed = new LexedAddress(normalized);
         CanonicalizedAddress canonicalized = new CanonicalizedAddress(

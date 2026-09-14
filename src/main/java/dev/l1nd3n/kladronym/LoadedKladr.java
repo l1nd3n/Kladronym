@@ -1,5 +1,10 @@
 package dev.l1nd3n.kladronym;
 
+import dev.l1nd3n.kladronym.preprocess.Abbreviation;
+import dev.l1nd3n.kladronym.preprocess.AbbreviationCatalog;
+import dev.l1nd3n.kladronym.preprocess.Toponym;
+import dev.l1nd3n.kladronym.kladr.KladrCode;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;

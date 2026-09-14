@@ -3,6 +3,8 @@ package dev.l1nd3n.kladronym;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import dev.l1nd3n.kladronym.kladr.KladrCode;
+import dev.l1nd3n.kladronym.kladr.KladrRank;
 import org.junit.jupiter.api.Test;
 
 final class KladrCodeTest {

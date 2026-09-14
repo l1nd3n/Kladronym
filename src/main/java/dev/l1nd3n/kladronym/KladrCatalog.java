@@ -1,5 +1,9 @@
 package dev.l1nd3n.kladronym;
 
+import dev.l1nd3n.kladronym.name.NameMatch;
+import dev.l1nd3n.kladronym.preprocess.Toponym;
+import dev.l1nd3n.kladronym.kladr.KladrCode;
+
 import java.util.List;
 
 final class KladrCatalog {
@@ -9,10 +13,10 @@ final class KladrCatalog {
         this.kladronyms = kladronyms;
     }
 
-    List<Kladronym> find(
+    public List<Kladronym> find(
         Toponym toponym,
         KladrCode scope,
-        ToponymNameMatch nameMatch
+        NameMatch nameMatch
     ) {
         return kladronyms.stream()
             .filter(candidate -> scope.contains(candidate.code()))

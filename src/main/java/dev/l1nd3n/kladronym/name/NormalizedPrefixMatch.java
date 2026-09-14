@@ -1,6 +1,8 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.name;
 
-public final class NormalizedPrefixMatch implements ToponymNameMatch {
+import dev.l1nd3n.kladronym.preprocess.NormalizedString;
+
+public final class NormalizedPrefixMatch implements NameMatch {
 
     @Override
     public boolean matches(String query, String candidate) {

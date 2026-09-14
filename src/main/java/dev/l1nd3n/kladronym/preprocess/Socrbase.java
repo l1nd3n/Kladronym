@@ -1,19 +1,19 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
-final class Socrbase {
+public final class Socrbase {
     private final AbbreviationCatalog abbreviations;
     private final LexemeAliases aliases;
 
-    Socrbase(AbbreviationCatalog abbreviations, LexemeAliases aliases) {
+    public Socrbase(AbbreviationCatalog abbreviations, LexemeAliases aliases) {
         this.abbreviations = abbreviations;
         this.aliases = aliases;
     }
 
-    AbbreviationCatalog abbreviations() {
+    public AbbreviationCatalog abbreviations() {
         return abbreviations;
     }
 
-    LexemeAliases aliases() {
+    public LexemeAliases aliases() {
         return aliases;
     }
 }

@@ -1,4 +1,4 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.kladr;
 
 import java.util.Objects;
 
@@ -47,10 +47,12 @@ public final class KladrCode {
     }
 
     public boolean contains(KladrCode other) {
-        if (other.rc == 0 && other.dc == 0 && other.cc == 0 && other.lc == 0) return false;
-        if (rc == 0 && dc == 0 && cc == 0 && lc == 0) return true;
-        if (other.rank().value() <= rank().value()) return false;
-        return switch (rank()) {
+        if (other.equals(ROOT)) return false;
+        if (equals(ROOT)) return true;
+        KladrRank thisRank = rank();
+        KladrRank otherRank = other.rank();
+        if (otherRank.compareTo(thisRank) <= 0) return false;
+        return switch (thisRank) {
             case REGION -> rc == other.rc;
             case DISTRICT -> rc == other.rc && dc == other.dc;
             case CITY -> rc == other.rc && dc == other.dc && cc == other.cc;

@@ -1,13 +1,13 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
-final class NormalizedString {
+public final class NormalizedString {
     private final String source;
 
-    NormalizedString(String source) {
+    public NormalizedString(String source) {
         this.source = source;
     }
 
-    String get() {
+    public String get() {
         StringBuilder result = new StringBuilder(source.length());
         boolean separator = true;
         for (int offset = 0; offset < source.length();) {

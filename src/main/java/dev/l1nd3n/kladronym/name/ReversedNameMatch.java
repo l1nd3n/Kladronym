@@ -1,13 +1,13 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.name;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-final class ReversedNameMatch implements ToponymNameMatch {
-    private final ToponymNameMatch origin;
+public final class ReversedNameMatch implements NameMatch {
+    private final NameMatch origin;
 
-    ReversedNameMatch(ToponymNameMatch origin) {
+    public ReversedNameMatch(NameMatch origin) {
         this.origin = origin;
     }
 

@@ -1,33 +1,30 @@
 package dev.l1nd3n.kladronym;
 
+import dev.l1nd3n.kladronym.name.ExtendedName;
+import dev.l1nd3n.kladronym.name.NameMatch;
+import dev.l1nd3n.kladronym.preprocess.Abbreviation;
+import dev.l1nd3n.kladronym.preprocess.Token;
+import dev.l1nd3n.kladronym.preprocess.Toponym;
+import dev.l1nd3n.kladronym.kladr.KladrCode;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 final class ResolutionPass {
     private final List<Token> tokens;
     private final KladrCatalog catalog;
-    private final ToponymNameMatch nameMatch;
+    private final NameMatch nameMatch;
+    private final ExtendedName extendedName;
 
-    ResolutionPass(List<Token> tokens, KladrCatalog catalog, ToponymNameMatch nameMatch) {
+
+    ResolutionPass(List<Token> tokens, KladrCatalog catalog, NameMatch nameMatch, ExtendedName extendedName) {
         this.tokens = tokens;
         this.catalog = catalog;
         this.nameMatch = nameMatch;
+        this.extendedName = extendedName;
     }
 
-    Optional<Kladronym> frontwards() {
-        return resolve(tokens, nameMatch, ExtendedName::frontwards);
-    }
-
-    Optional<Kladronym> backwards() {
-        return resolve(tokens.reversed(), new ReversedNameMatch(nameMatch), ExtendedName::backwards);
-    }
-
-    private Optional<Kladronym> resolve(
-        List<Token> tokens,
-        ToponymNameMatch nameMatch,
-        Function<ExtendedName, String> extendName
-    ) {
+    public Optional<Kladronym> resolve() {
         int index = 0;
         KladrCode scope = KladrCode.ROOT;
         Kladronym result = null;
@@ -56,7 +53,6 @@ final class ResolutionPass {
                         expectedType = token.abbreviation();
                     } else {
                         result = typed.getFirst();
-                        expectedType = null;
                     }
                     scope = result.code();
                     name = "";
@@ -67,14 +63,13 @@ final class ResolutionPass {
             }
             boolean consumed = false;
             while (!consumed) {
-                ExtendedName extension = new ExtendedName(name, token.value());
-                String extendedName = extendName.apply(extension);
+                String extName = extendedName.extend(name, token.value());
                 Toponym toponym = expectedType == null
-                    ? new Toponym(extendedName)
-                    : new Toponym(extendedName, expectedType);
+                    ? new Toponym(extName)
+                    : new Toponym(extName, expectedType);
                 List<Kladronym> matched = catalog.find(toponym, scope, nameMatch);
                 if (!matched.isEmpty()) {
-                    name = extendedName;
+                    name = extName;
                     candidates = matched;
                     consumed = true;
                 } else if (!candidates.isEmpty()) {

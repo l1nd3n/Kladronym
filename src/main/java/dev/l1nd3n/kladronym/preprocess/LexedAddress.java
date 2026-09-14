@@ -1,15 +1,15 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
 import java.util.List;
 
-final class LexedAddress {
+public final class LexedAddress {
     private final NormalizedString address;
 
-    LexedAddress(NormalizedString address) {
+    public LexedAddress(NormalizedString address) {
         this.address = address;
     }
 
-    List<String> get() {
+    public List<String> get() {
         String normalized = address.get();
         if (normalized.isEmpty()) return List.of();
         return List.of(normalized.split(" "));

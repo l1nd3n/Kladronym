@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 final class LikelyKladronymRegressionTest {
@@ -28,7 +29,7 @@ final class LikelyKladronymRegressionTest {
         List<String> result = new ArrayList<>();
         result.add("address\ttoponym\tcode");
         for (String address : addresses) {
-            Kladronym kladronym = new LikelyKladronym(address).get().orElse(null);
+            Kladronym kladronym = new LikelyKladronym(address).find().orElse(null);
             String toponym = kladronym == null ? "" : kladronym.toponym().toString();
             String code = kladronym == null ? "" : kladronym.code().toString();
             result.add("%s\t%s\t%s".formatted(address, toponym, code));

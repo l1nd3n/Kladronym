@@ -1,25 +1,25 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
 
-final class Token {
+public final class Token {
     private final TokenType type;
     private final String value;
     private final Abbreviation abbreviation;
 
-    Token(TokenType type, String value, Abbreviation abbreviation) {
+    public Token(TokenType type, String value, Abbreviation abbreviation) {
         this.type = type;
         this.value = value;
         this.abbreviation = abbreviation;
     }
 
-    boolean isAbbreviation() {
+    public boolean isAbbreviation() {
         return type == TokenType.ABBREVIATION;
     }
 
-    String value() {
+    public String value() {
         return value;
     }
 
-    Abbreviation abbreviation() {
+    public Abbreviation abbreviation() {
         return abbreviation;
     }
 }

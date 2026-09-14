@@ -1,4 +1,6 @@
-package dev.l1nd3n.kladronym;
+package dev.l1nd3n.kladronym.preprocess;
+
+import dev.l1nd3n.kladronym.name.NameMatch;
 
 public final class Toponym {
     private final String name;
@@ -14,7 +16,7 @@ public final class Toponym {
         this.abbreviation = abbreviation;
     }
 
-    public boolean matches(Toponym candidate, ToponymNameMatch nameMatch) {
+    public boolean matches(Toponym candidate, NameMatch nameMatch) {
         if (!nameMatch.matches(name, candidate.name)) return false;
         if (abbreviation == null || candidate.abbreviation == null) return true;
         return abbreviation.fullNames().stream()
