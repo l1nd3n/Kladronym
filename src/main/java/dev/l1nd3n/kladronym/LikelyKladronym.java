@@ -1,42 +1,58 @@
 package dev.l1nd3n.kladronym;
 
-import dev.l1nd3n.kladronym.name.BwExtension;
-import dev.l1nd3n.kladronym.name.FwExtension;
-import dev.l1nd3n.kladronym.name.NameMatch;
-import dev.l1nd3n.kladronym.name.ReversedNameMatch;
-import dev.l1nd3n.kladronym.preprocess.PreprocessedAddress;
-import dev.l1nd3n.kladronym.preprocess.Socrbase;
-import dev.l1nd3n.kladronym.preprocess.Token;
+import dev.l1nd3n.kladronym.catalog.Kladr;
+import dev.l1nd3n.kladronym.catalog.Kladronym;
+import dev.l1nd3n.kladronym.source.FiasSource;
+import dev.l1nd3n.kladronym.text.Abbreviations;
+import dev.l1nd3n.kladronym.text.Aliases;
+import dev.l1nd3n.kladronym.text.PreprocessedAddress;
+import dev.l1nd3n.kladronym.text.Token;
+import dev.l1nd3n.kladronym.text.name.BwExtension;
+import dev.l1nd3n.kladronym.text.name.FwExtension;
+import dev.l1nd3n.kladronym.text.name.NameMatch;
+import dev.l1nd3n.kladronym.text.name.ReversedNameMatch;
 
 import java.util.List;
 import java.util.Optional;
 
 public final class LikelyKladronym {
     private final String source;
-    private final LoadedSocrbase socrbase;
-    private final LoadedKladr kladr;
+    private final FiasSource<Abbreviations> abbreviations;
+    private final FiasSource<Kladr> kladr;
     private final NameMatch nameMatch;
 
     public LikelyKladronym(String source) {
-        this(source, BundledData.NAME_MATCH, BundledData.SOCRBASE, BundledData.KLADR);
+        this(source, BundledData.NAME_MATCH, BundledData.ABBREVIATIONS, BundledData.KLADR);
     }
 
     public LikelyKladronym(String source, NameMatch nameMatch) {
-        this(source, nameMatch, BundledData.SOCRBASE, BundledData.KLADR);
+        this(source, nameMatch, BundledData.ABBREVIATIONS, BundledData.KLADR);
     }
 
-    private LikelyKladronym(String source, NameMatch nameMatch, LoadedSocrbase socrbase, LoadedKladr kladr) {
+    public LikelyKladronym(String source, NameMatch nameMatch,
+                           FiasSource<Abbreviations> abbreviations, FiasSource<Kladr> kladr) {
         this.source = source;
         this.nameMatch = nameMatch;
-        this.socrbase = socrbase;
+        this.abbreviations = abbreviations;
         this.kladr = kladr;
     }
 
     public Optional<Kladronym> find() {
-        Socrbase loadedSocrbase = socrbase.get();
-        KladrCatalog catalog = kladr.get();
-        List<Token> tokens = new PreprocessedAddress(source, loadedSocrbase).get();
-        return new ResolutionPass(tokens, catalog, nameMatch, new FwExtension()).resolve()
-                .or(() -> new ResolutionPass(tokens.reversed(), catalog, new ReversedNameMatch(nameMatch), new BwExtension()).resolve());
+        Abbreviations types = load(abbreviations, "abbreviations");
+        Kladr catalog = load(kladr, "KLADR");
+        List<Token> tokens = new PreprocessedAddress(source, new Aliases(types)).get();
+        return new ResolutionPass(tokens, catalog,
+                new StandardToponymMatch(nameMatch, types), new FwExtension()).resolve()
+                .or(() -> new ResolutionPass(tokens.reversed(), catalog,
+                        new StandardToponymMatch(new ReversedNameMatch(nameMatch), types),
+                        new BwExtension()).resolve());
+    }
+
+    private <T> T load(FiasSource<T> source, String description) {
+        try {
+            return source.load();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot load " + description + " from " + source, exception);
+        }
     }
 }

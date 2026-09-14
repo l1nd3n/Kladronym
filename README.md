@@ -44,100 +44,88 @@ import dev.l1nd3n.kladronym.LikelyKladronym;
 var result = new LikelyKladronym("Саратовская обл г Саратов").find();
 ```
 
-Справочники упакованы в JAR. Они лениво загружаются при первом вызове `get()`,
-после чего один неизменяемый снимок данных используется всеми экземплярами.
+Справочники упакованы в JAR и лениво загружаются при первом вызове `find()`.
+Стандартные источники кэшируют неизменяемые данные. Каждый `Aliases`
+строит своё дерево при первом обращении и затем использует его повторно.
 
-## Подсказки по началу имени
-
-`PossibleKladronyms` получает имя, необязательный тип и область поиска:
+### Собственные источники
 
 ```java
-import dev.l1nd3n.kladronym.kladr.KladrCode;
-import dev.l1nd3n.kladronym.preprocess.Toponym;
-import dev.l1nd3n.kladronym.PossibleKladronyms;
-import dev.l1nd3n.kladronym.BundledData;
+import dev.l1nd3n.kladronym.*;
+import dev.l1nd3n.kladronym.source.CachedSource;
+import dev.l1nd3n.kladronym.text.name.NormalizedPrefixMatch;
+import java.nio.file.Path;
 
-var city = BundledData.SOCRBASE.get().abbreviations().find("г").orElseThrow();
-var candidates = new PossibleKladronyms(
-        new Toponym("Ба", city),
-        new KladrCode("61000000000"),
-        BundledData.KLADR.get()
-).get();
-
-candidates.
-
-forEach(candidate ->
-        System.out.
-
-println(candidate.toponym() +"  "+candidate.
-
-code())
-        );
+var abbreviations = new CachedSource<>(new SocrSource(Path.of("socrbase.tsv")));
+var kladr = new CachedSource<>(new KladrSource(Path.of("kladr.tsv")));
+var result = new LikelyKladronym(
+        "Саратовская обл г Саратов",
+        new NormalizedPrefixMatch(),
+        abbreviations,
+        kladr
+).find();
 ```
 
-Пустое имя `new Toponym("", city)` возвращает все подходящие города внутри
-области поиска. `new Toponym("Ба")` ищет без ограничения типа,
-а `KladrCode.ROOT` задаёт поиск по всему каталогу.
+Конструкторы не читают файлы. Основной конструктор принимает
+`FiasSource<Abbreviations>` и `FiasSource<Kladr>`; можно передать лямбды,
+возвращающие подготовленные справочники. Каждый `find()` вызывает переданные
+источники. Кэширование загрузки выполняет только явный `CachedSource`;
+у `LikelyKladronym` собственного кэша нет.
+Ошибка загрузки вызывает `IllegalStateException` с исходной причиной.
+`Optional.empty()` означает, что кладроним не найден.
 
-Подсказки допускают неполное слово, игнорируют регистр и различие `ё`/`е`.
-Результат — неизменяемый список, упорядоченный сначала по позиции кода
-от крупной к мелкой, затем по полному коду. Условия поиска передаются уже
-разобранными. Для проверки подсказок на вводимой адресной строке есть
-отдельная утилита ниже.
+### Топонимы и сравнение
 
-## Проверка подсказок в терминале
+```java
+import dev.l1nd3n.kladronym.*;
+import dev.l1nd3n.kladronym.text.name.NormalizedPrefixMatch;
+import dev.l1nd3n.kladronym.catalog.toponym.Toponym;
 
-Нужны Java 21+, Maven и терминал Linux/macOS с `stty`.
-Скрипт запуска сначала собирает библиотеку, затем выполняет `scripts/Suggest.java`:
-
-```bash
-./scripts/suggest
+var query = new Toponym("Саратов", "г.");
+var candidate = new Toponym("Саратов", "город");
+var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource().load());
+boolean matches = query.matches(candidate, match);
 ```
 
-Можно сразу задать начальную строку:
+`Toponym` хранит переданные имя и обозначение типа. `new Toponym("Саратов")`
+создаёт топоним без типа. Наличие объекта не подтверждает корректность
+обозначения. `ToponymMatch` — функциональный интерфейс для своей стратегии;
+стандартная реализация сопоставляет имена и пересекает допустимые полные типы.
+Отсутствие типа у любой стороны сохраняет прежнее сравнение только по имени.
 
-```bash
-./scripts/suggest 'Ростовская область, г.'
+### Отображение
+
+```java
+import dev.l1nd3n.kladronym.*;
+import dev.l1nd3n.kladronym.catalog.code.KladrCode;
+
+var kladr = new KladrSource().load();
+var abbreviations = new SocrSource().load();
+var code = new KladrCode("64000001000");
+var found = kladr.find(code).orElseThrow();
+
+String single = new FormattedKladronym(found, abbreviations).get();
+// Саратов (Город)
+String hierarchy = new FormattedKladrAddress(code, kladr, abbreviations).get();
+// Саратовская (Область), Саратов (Город)
 ```
 
-Подсказки обновляются после каждого изменения строки, без Enter.
-Для примера выше текущий справочник возвращает 23 города.
-После добавления `Ба` остаётся Батайск.
+`Toponym.toString()` выводит сохранённое обозначение без раскрытия сокращения.
+Для прежнего отображения полного типа используйте `FormattedKladronym`.
+Несколько полных обозначений соединяются через `/` в порядке справочника;
+неизвестное обозначение остаётся исходным. Форматирование иерархии проходит
+значимые уровни кода сверху вниз, пропуская нулевые позиции.
+Контракт для отсутствующих записей иерархии в собственных данных пока не определён.
 
-- `←` / `→`, Home / End — перемещение курсора.
-- Backspace / Delete — удаление символов.
-- `↑` / `↓`, Page Up / Page Down — прокрутка всех результатов.
-- Ctrl+U — очистка строки.
-- Ctrl+L — обновление размеров после изменения окна терминала.
-- Ctrl+C или Ctrl+D — выход с восстановлением настроек терминала.
+### Поиск внутри области
 
-Полный список для одной строки, в том числе для использования в конвейере:
+`Kladr.find(toponym, scope, match)` возвращает неизменяемый список кандидатов,
+отсортированный по рангу, затем полному коду. `KladrCode.ROOT` задаёт поиск
+по всему каталогу. `Kladr.find(code)` ищет точное совпадение кода и возвращает
+`Optional<Kladronym>`.
 
-```bash
-./scripts/suggest --once 'Ростовская область, г. Ба'
-```
-
-Если библиотека уже собрана, Java-файл можно запустить напрямую:
-
-```bash
-java --class-path target/kladronym-0.1.0-SNAPSHOT.jar scripts/Suggest.java
-```
-
-Запятые между частями адреса необязательны: `Ростовская обл г.` и
-`Ростовская обл, г.` дают одинаковые подсказки городов. Часть до последней
-запятой разрешается через `LikelyKladronym` и задаёт область поиска.
-Без запятой граница определяется по полному имени из справочника:
-распознанная часть ограничивает поиск последующей. Тип может стоять до
-или после имени: `г. Ба` и `Ба город` дают одинаковые подсказки.
-Утилита показывает кладронимы
-встроенного справочника, без улиц и домов.
-
-Проверка утилиты, включая посимвольный ввод в псевдотерминале,
-прокрутку и восстановление настроек после Ctrl+C и SIGTERM:
-
-```bash
-python3 scripts/test_suggest.py
-```
+Скрипт подсказок в `scripts/` остаётся исходным прототипом со старым
+интерфейсом. Его адаптация не входит в этот рефакторинг.
 
 ## Сборка
 
