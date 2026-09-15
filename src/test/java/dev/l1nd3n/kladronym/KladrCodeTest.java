@@ -18,6 +18,25 @@ final class KladrCodeTest {
     }
 
     @Test
+    void truncatesCodeAtRequestedRank() {
+        KladrCode code = new KladrCode(64, 1, 2, 3);
+        assertEquals(new KladrCode(64, 0, 0, 0), code.atRank(KladrRank.REGION));
+        assertEquals(new KladrCode(64, 1, 0, 0), code.atRank(KladrRank.DISTRICT));
+        assertEquals(new KladrCode(64, 1, 2, 0), code.atRank(KladrRank.CITY));
+        assertEquals(code, code.atRank(KladrRank.LOCALITY));
+    }
+
+    @Test
+    void truncationPreservesZeroLevelsAndRoot() {
+        KladrCode city = new KladrCode(64, 0, 1, 0);
+        assertEquals(city.atRank(KladrRank.REGION), city.atRank(KladrRank.DISTRICT));
+        assertEquals(city, city.atRank(KladrRank.LOCALITY));
+        for (KladrRank rank : KladrRank.values()) {
+            assertEquals(KladrCode.ROOT, KladrCode.ROOT.atRank(rank));
+        }
+    }
+
+    @Test
     void comparesCodesByValue() {
         KladrCode code = new KladrCode(64, 0, 1, 0);
         KladrCode equal = new KladrCode(64, 0, 1, 0);

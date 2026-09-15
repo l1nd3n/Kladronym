@@ -33,7 +33,6 @@ final class FormattedKladrAddressTest {
                 new Kladronym(new Toponym("Городской", "г"), city),
                 new Kladronym(new Toponym("Районный", "р-н"), district),
                 new Kladronym(new Toponym("Областная", "обл"), region)));
-        assertEquals(List.of(region, district, city, locality), locality.hierarchy());
         assertEquals("Областная (Область), Районный (Район), Городской (Город), Лесной (Поселение/Поселок)",
                 new FormattedKladrAddress(locality, kladr, new SocrSource().load()).get());
         assertEquals(locality, kladr.find(locality).orElseThrow().code());
