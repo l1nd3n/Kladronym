@@ -54,10 +54,12 @@ var result = new LikelyKladronym("Саратовская обл г Сарато�
 import dev.l1nd3n.kladronym.*;
 import dev.l1nd3n.kladronym.source.CachedSource;
 import dev.l1nd3n.kladronym.text.name.NormalizedPrefixMatch;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-var abbreviations = new CachedSource<>(new SocrSource(Path.of("socrbase.tsv")));
-var kladr = new CachedSource<>(new KladrSource(Path.of("kladr.tsv")));
+var abbreviations = new CachedSource<>(new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)));
+var kladr = new CachedSource<>(new KladrSource(() -> Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)));
 var result = new LikelyKladronym(
         "Саратовская обл г Саратов",
         new NormalizedPrefixMatch(),
@@ -65,6 +67,10 @@ var result = new LikelyKladronym(
         kladr
 ).find();
 ```
+
+`KladrSource` и `SocrSource` принимают `FiasSource<Reader>`: вызывающий код
+задаёт открытие текста и кодировку. Каждый `load()` получает новый `Reader`
+и закрывает его после чтения, в том числе при ошибке.
 
 Конструкторы не читают файлы. Основной конструктор принимает
 `FiasSource<Abbreviations>` и `FiasSource<Kladr>`; можно передать лямбды,
@@ -80,10 +86,13 @@ var result = new LikelyKladronym(
 import dev.l1nd3n.kladronym.*;
 import dev.l1nd3n.kladronym.text.name.NormalizedPrefixMatch;
 import dev.l1nd3n.kladronym.catalog.toponym.Toponym;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 var query = new Toponym("Саратов", "г.");
 var candidate = new Toponym("Саратов", "город");
-var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource().load());
+var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load());
 boolean matches = query.matches(candidate, match);
 ```
 
@@ -98,9 +107,13 @@ boolean matches = query.matches(candidate, match);
 ```java
 import dev.l1nd3n.kladronym.*;
 import dev.l1nd3n.kladronym.catalog.code.KladrCode;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-var kladr = new KladrSource().load();
-var abbreviations = new SocrSource().load();
+var kladr = new KladrSource(() ->
+        Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)).load();
+var abbreviations = new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load();
 var code = new KladrCode("64000001000");
 var found = kladr.find(code).orElseThrow();
 

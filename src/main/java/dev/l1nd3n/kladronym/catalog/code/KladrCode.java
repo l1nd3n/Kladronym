@@ -15,7 +15,9 @@ import java.util.Objects;
  * {@code 64}, with no district level.
  */
 public final class KladrCode {
-    /** Virtual root for searching the entire catalog; does not identify a real object. */
+    /**
+     * Virtual root for searching the entire catalog; does not identify a real object.
+     */
     public static final KladrCode ROOT = new KladrCode(0, 0, 0, 0);
 
     private final int rc;

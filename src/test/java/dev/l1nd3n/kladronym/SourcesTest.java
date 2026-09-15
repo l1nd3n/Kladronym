@@ -110,6 +110,7 @@ final class SourcesTest {
         assertEquals(2, typeCalls.get());
         assertEquals(2, kladrCalls.get());
     }
+
     @Test
     void opensAndClosesAReaderForEachLoad() throws Exception {
         var opened = new AtomicInteger();
