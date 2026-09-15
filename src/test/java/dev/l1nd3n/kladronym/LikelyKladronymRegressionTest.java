@@ -17,7 +17,7 @@ final class LikelyKladronymRegressionTest {
     private static final String RESOURCE_ROOT = "/dev/l1nd3n/kladronym/";
 
     private static List<String> createResult(List<String> addresses) throws Exception {
-        Abbreviations abbreviations = new SocrSource().load();
+        Abbreviations abbreviations = BundledData.ABBREVIATIONS.load();
         List<String> result = new ArrayList<>();
         result.add("address\ttoponym\tcode");
         for (String address : addresses) {

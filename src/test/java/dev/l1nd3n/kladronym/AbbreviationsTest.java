@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 final class AbbreviationsTest {
     @Test
     void indexesFullAndShortFormsWithTheSameNormalization() throws Exception {
-        Abbreviations types = new SocrSource().load();
+        Abbreviations types = BundledData.ABBREVIATIONS.load();
         assertEquals(List.of("Республика"), types.find("РЕСП.").map(List::copyOf).orElseThrow());
         assertEquals(List.of("Городской округ"), types.find("Г.О.").map(List::copyOf).orElseThrow());
         assertEquals(List.of("Город"), types.find("город").map(List::copyOf).orElseThrow());
@@ -40,7 +40,7 @@ final class AbbreviationsTest {
 
     @Test
     void recognizesLongestSpellingAndKeepsCanonicalAmbiguity() throws Exception {
-        var types = new SocrSource().load();
+        var types = BundledData.ABBREVIATIONS.load();
         var aliases = new Aliases(types);
         assertEquals(new TypeMatch("г.о.", 2), aliases.match(List.of("г", "о", "пушкинский"), 0).orElseThrow());
         assertEquals(3, aliases.match(List.of("ж", "д", "ст", "лесная"), 0).orElseThrow().length());
@@ -56,7 +56,7 @@ final class AbbreviationsTest {
 
     @Test
     void supportsConcurrentFirstUseOfTheSameTree() throws Exception {
-        var aliases = new Aliases(new SocrSource().load());
+        var aliases = new Aliases(BundledData.ABBREVIATIONS.load());
         var ready = new CountDownLatch(8);
         var start = new CountDownLatch(1);
         try (var executor = Executors.newFixedThreadPool(8)) {
@@ -85,7 +85,7 @@ final class AbbreviationsTest {
     void toponymStoresDesignationAndDelegatesComparison() throws Exception {
         var query = new Toponym("Саратов", "г.");
         var candidate = new Toponym("Саратов", "город");
-        var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource().load());
+        var match = new StandardToponymMatch(new NormalizedPrefixMatch(), BundledData.ABBREVIATIONS.load());
         assertEquals("г.", query.type());
         assertTrue(query.matches(candidate, match));
         assertFalse(query.matches(new Toponym("Саратов", "обл"), match));

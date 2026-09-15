@@ -31,8 +31,8 @@ final class SourcesTest {
     void readsCustomSourcesLazilyAndRetainsKladrType() throws Exception {
         Path typesFile = directory.resolve("socr.tsv");
         Path kladrFile = directory.resolve("kladr.tsv");
-        var typesSource = new SocrSource(typesFile);
-        var kladrSource = new KladrSource(kladrFile);
+        var typesSource = new SocrSource(() -> Files.newBufferedReader(typesFile));
+        var kladrSource = new KladrSource(() -> Files.newBufferedReader(kladrFile));
         var resolver = new LikelyKladronym("город Тестов", new NormalizedPrefixMatch(), typesSource, kladrSource);
         Files.writeString(typesFile, "scname\tsocrname\nг\tГород\nг.\tГород\n");
         Files.writeString(kladrFile, "name\tsocr\tcode\nТестов\tг\t64000001000\n");
@@ -83,7 +83,7 @@ final class SourcesTest {
     void preservesCanonicalChoiceAcrossInterleavedRows() throws Exception {
         Path file = directory.resolve("interleaved.tsv");
         Files.writeString(file, "scname\tsocrname\nа\tПервый\nб\tВторой\nа\tВторой\n");
-        var types = new SocrSource(file).load();
+        var types = new SocrSource(() -> Files.newBufferedReader(file)).load();
         assertEquals(List.of("Первый", "Второй"), types.find("а").map(List::copyOf).orElseThrow());
         assertEquals("б", new Aliases(types).match(List.of("второй"), 0).orElseThrow().spelling());
     }
@@ -109,5 +109,48 @@ final class SourcesTest {
         assertTrue(resolver.find().isPresent());
         assertEquals(2, typeCalls.get());
         assertEquals(2, kladrCalls.get());
+    }
+    @Test
+    void opensAndClosesAReaderForEachLoad() throws Exception {
+        var opened = new AtomicInteger();
+        var closed = new AtomicInteger();
+        String content = "name\tsocr\tcode\nТестов\tг\t64000001000\n";
+        var source = new KladrSource(() -> {
+            opened.incrementAndGet();
+            return new java.io.StringReader(content) {
+                @Override
+                public void close() {
+                    closed.incrementAndGet();
+                    super.close();
+                }
+            };
+        });
+        assertEquals(0, opened.get());
+        var code = new KladrCode("64000001000");
+        assertEquals("Тестов", source.load().find(code).orElseThrow().toponym().name());
+        assertEquals(1, closed.get());
+        assertEquals("Тестов", source.load().find(code).orElseThrow().toponym().name());
+        assertEquals(2, opened.get());
+        assertEquals(2, closed.get());
+    }
+
+    @Test
+    void socrClosesReaderAfterFailureAndOpensANewOneOnRetry() throws Exception {
+        var opened = new AtomicInteger();
+        var closed = new AtomicInteger();
+        var source = new SocrSource(() -> new java.io.StringReader(
+                opened.incrementAndGet() == 1 ? "invalid header" : "scname\tsocrname\nг\tГород\n") {
+            @Override
+            public void close() {
+                closed.incrementAndGet();
+                super.close();
+            }
+        });
+        assertEquals(0, opened.get());
+        assertThrows(IOException.class, source::load);
+        assertEquals(1, closed.get());
+        assertEquals(Set.of("Город"), source.load().find("город").orElseThrow());
+        assertEquals(2, opened.get());
+        assertEquals(2, closed.get());
     }
 }

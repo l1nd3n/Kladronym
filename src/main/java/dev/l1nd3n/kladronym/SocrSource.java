@@ -6,26 +6,19 @@ import dev.l1nd3n.kladronym.text.name.NormalizedString;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.Reader;
 import java.util.*;
 
 public final class SocrSource implements FiasSource<Abbreviations> {
-    private final Path path;
+    private final FiasSource<Reader> input;
 
-    public SocrSource() {
-        this(null);
-    }
-
-    public SocrSource(Path path) {
-        this.path = path;
+    public SocrSource(FiasSource<Reader> input) {
+        this.input = input;
     }
 
     @Override
-    public Abbreviations load() throws IOException {
-        try (var reader = reader()) {
+    public Abbreviations load() throws Exception {
+        try (var reader = new BufferedReader(input.load())) {
             String header = reader.readLine();
             if (!"scname\tsocrname".equals(header)) throw new IOException("Unexpected SOCR header: " + header);
             Map<String, Set<String>> meanings = new LinkedHashMap<>();
@@ -51,10 +44,4 @@ public final class SocrSource implements FiasSource<Abbreviations> {
         }
     }
 
-    private BufferedReader reader() throws IOException {
-        if (path != null) return Files.newBufferedReader(path);
-        var stream = SocrSource.class.getResourceAsStream("/dev/l1nd3n/kladronym/socrbase.tsv");
-        if (stream == null) throw new IOException("SOCR resource not found");
-        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-    }
 }

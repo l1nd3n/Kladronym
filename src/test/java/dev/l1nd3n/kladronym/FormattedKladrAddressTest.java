@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 final class FormattedKladrAddressTest {
     @Test
     void formatsRealHierarchyWithoutInventingZeroLevels() throws Exception {
-        var kladr = new KladrSource().load();
-        var types = new SocrSource().load();
+        var kladr = BundledData.KLADR.load();
+        var types = BundledData.ABBREVIATIONS.load();
         assertEquals("Саратовская (Область), Саратов (Город)",
                 new FormattedKladrAddress(new KladrCode("64000001000"), kladr, types).get());
         assertEquals("Москва (Город)",
@@ -34,17 +34,17 @@ final class FormattedKladrAddressTest {
                 new Kladronym(new Toponym("Районный", "р-н"), district),
                 new Kladronym(new Toponym("Областная", "обл"), region)));
         assertEquals("Областная (Область), Районный (Район), Городской (Город), Лесной (Поселение/Поселок)",
-                new FormattedKladrAddress(locality, kladr, new SocrSource().load()).get());
+                new FormattedKladrAddress(locality, kladr, BundledData.ABBREVIATIONS.load()).get());
         assertEquals(locality, kladr.find(locality).orElseThrow().code());
         assertTrue(kladr.find(new KladrCode("65000000000")).isEmpty());
-        var match = new StandardToponymMatch((query, candidate) -> true, new SocrSource().load());
+        var match = new StandardToponymMatch((query, candidate) -> true, BundledData.ABBREVIATIONS.load());
         assertEquals(List.of(region, district, city, locality),
                 kladr.find(new Toponym(""), KladrCode.ROOT, match).stream().map(Kladronym::code).toList());
     }
 
     @Test
     void formatsUnknownAndAbsentTypesWithoutChangingToponym() throws Exception {
-        var types = new SocrSource().load();
+        var types = BundledData.ABBREVIATIONS.load();
         var unknown = new Kladronym(new Toponym("Имя", "неизвестный"), new KladrCode("64000000000"));
         assertEquals("Имя (неизвестный)", new FormattedKladronym(unknown, types).get());
         var absent = new Kladronym(new Toponym("Имя"), unknown.code());

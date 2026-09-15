@@ -8,25 +8,18 @@ import dev.l1nd3n.kladronym.source.FiasSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.Reader;
 
 public final class KladrSource implements FiasSource<Kladr> {
-    private final Path path;
+    private final FiasSource<Reader> input;
 
-    public KladrSource() {
-        this(null);
-    }
-
-    public KladrSource(Path path) {
-        this.path = path;
+    public KladrSource(FiasSource<Reader> input) {
+        this.input = input;
     }
 
     @Override
-    public Kladr load() throws IOException {
-        try (var reader = reader()) {
+    public Kladr load() throws Exception {
+        try (var reader = new BufferedReader(input.load())) {
             String header = reader.readLine();
             if (!"name\tsocr\tcode".equals(header)) throw new IOException("Unexpected KLADR header: " + header);
             return new Kladr(reader.lines()
@@ -37,10 +30,4 @@ public final class KladrSource implements FiasSource<Kladr> {
         }
     }
 
-    private BufferedReader reader() throws IOException {
-        if (path != null) return Files.newBufferedReader(path);
-        var stream = KladrSource.class.getResourceAsStream("/dev/l1nd3n/kladronym/kladr.tsv");
-        if (stream == null) throw new IOException("KLADR resource not found");
-        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-    }
 }
