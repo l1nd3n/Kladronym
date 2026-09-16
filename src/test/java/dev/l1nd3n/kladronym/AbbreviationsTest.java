@@ -1,10 +1,7 @@
 package dev.l1nd3n.kladronym;
 
 import dev.l1nd3n.kladronym.catalog.toponym.Toponym;
-import dev.l1nd3n.kladronym.text.Abbreviations;
-import dev.l1nd3n.kladronym.text.Aliases;
-import dev.l1nd3n.kladronym.text.PreprocessedAddress;
-import dev.l1nd3n.kladronym.text.TypeMatch;
+import dev.l1nd3n.kladronym.text.*;
 import dev.l1nd3n.kladronym.text.name.NormalizedPrefixMatch;
 import org.junit.jupiter.api.Test;
 
@@ -46,12 +43,12 @@ final class AbbreviationsTest {
         assertEquals(3, aliases.match(List.of("ж", "д", "ст", "лесная"), 0).orElseThrow().length());
         var tokens = new PreprocessedAddress("поселение Лесной", aliases).get();
         assertEquals(2, tokens.size());
-        assertTrue(tokens.getFirst().isAbbreviation());
+        assertSame(TokenType.ABBREVIATION, tokens.getFirst().type());
         assertEquals("п", tokens.getFirst().value());
         assertEquals(List.of("Поселение", "Поселок"), types.find(tokens.getFirst().value()).map(List::copyOf).orElseThrow());
-        assertFalse(tokens.getLast().isAbbreviation());
+        assertEquals(TokenType.TEXT, tokens.getLast().type());
         assertEquals("лесной", tokens.getLast().value());
-        assertFalse(new PreprocessedAddress("неизвестное", aliases).get().getFirst().isAbbreviation());
+        assertEquals(TokenType.TEXT, new PreprocessedAddress("неизвестное", aliases).get().getFirst().type());
     }
 
     @Test

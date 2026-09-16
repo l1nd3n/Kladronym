@@ -41,9 +41,9 @@ public final class LikelyKladronym {
         Abbreviations types = load(abbreviations, "abbreviations");
         Kladr catalog = load(kladr, "KLADR");
         List<Token> tokens = new PreprocessedAddress(source, new Aliases(types)).get();
-        return new ResolutionPass(tokens, catalog,
+        return new KladronymResolution(tokens, catalog,
                 new StandardToponymMatch(nameMatch, types), new FwExtension()).resolve()
-                .or(() -> new ResolutionPass(tokens.reversed(), catalog,
+                .or(() -> new KladronymResolution(tokens.reversed(), catalog,
                         new StandardToponymMatch(new ReversedNameMatch(nameMatch), types),
                         new BwExtension()).resolve());
     }
