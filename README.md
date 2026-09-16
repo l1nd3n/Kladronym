@@ -58,13 +58,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-var abbreviations = new CachedSource<>(new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)));
-var kladr = new CachedSource<>(new KladrSource(() -> Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)));
+var abbreviations = new CachedSource<>(
+    new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)));
+var kladr = new CachedSource<>(
+    new KladrSource(() -> Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)));
 var result = new LikelyKladronym(
-        "Саратовская обл г Саратов",
-        new NormalizedPrefixMatch(),
-        abbreviations,
-        kladr
+    "Саратовская обл г Саратов",
+    new NormalizedPrefixMatch(),
+    abbreviations,
+    kladr
 ).find();
 ```
 
@@ -92,7 +94,8 @@ import java.nio.file.Path;
 
 var query = new Toponym("Саратов", "г.");
 var candidate = new Toponym("Саратов", "город");
-var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load());
+var match = new StandardToponymMatch(new NormalizedPrefixMatch(), new SocrSource(
+    () -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load());
 boolean matches = query.matches(candidate, match);
 ```
 
@@ -112,8 +115,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 var kladr = new KladrSource(() ->
-        Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)).load();
-var abbreviations = new SocrSource(() -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load();
+    Files.newBufferedReader(Path.of("kladr.tsv"), StandardCharsets.UTF_8)).load();
+var abbreviations = new SocrSource(
+    () -> Files.newBufferedReader(Path.of("socrbase.tsv"), StandardCharsets.UTF_8)).load();
 var code = new KladrCode("64000001000");
 var found = kladr.find(code).orElseThrow();
 
