@@ -58,8 +58,7 @@
       <version>${junit.version}</version>
     </dependency>
   </dependencies>
-  <description>A lightweight, offline Java library for resolving free-form Russian addresses to
-    KLADR codes
+  <description>A lightweight, offline Java library for recognizing free-form Russian addresses using KLADR/FIAS data.
   </description>
   <groupId>dev.l1nd3n</groupId>
   <modelVersion>4.0.0</modelVersion>
