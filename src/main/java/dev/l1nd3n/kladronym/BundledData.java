@@ -16,16 +16,16 @@ final class BundledData {
   static final FiasSource<Abbreviations> ABBREVIATIONS = new CachedSource<>(new SocrSource(() -> {
     InputStream stream = BundledData.class.getResourceAsStream(
         "/dev/l1nd3n/kladronym/socrbase.tsv");
-      if (stream == null) {
-          throw new IOException("SOCR resource not found");
-      }
+    if (stream == null) {
+      throw new IOException("SOCR resource not found");
+    }
     return new InputStreamReader(stream, StandardCharsets.UTF_8);
   }));
   static final FiasSource<Kladr> KLADR = new CachedSource<>(new KladrSource(() -> {
     InputStream stream = BundledData.class.getResourceAsStream("/dev/l1nd3n/kladronym/kladr.tsv");
-      if (stream == null) {
-          throw new IOException("KLADR resource not found");
-      }
+    if (stream == null) {
+      throw new IOException("KLADR resource not found");
+    }
     return new InputStreamReader(stream, StandardCharsets.UTF_8);
   }));
   static final NameMatch NAME_MATCH = new NormalizedPrefixMatch();

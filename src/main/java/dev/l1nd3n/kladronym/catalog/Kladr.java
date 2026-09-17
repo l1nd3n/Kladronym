@@ -3,6 +3,7 @@ package dev.l1nd3n.kladronym.catalog;
 import dev.l1nd3n.kladronym.catalog.code.KladrCode;
 import dev.l1nd3n.kladronym.catalog.toponym.Toponym;
 import dev.l1nd3n.kladronym.catalog.toponym.ToponymMatch;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +24,19 @@ public final class Kladr {
       KladrCode scope,
       ToponymMatch match
   ) {
+    return find(toponym, scope, match, new RankOrder());
+  }
+
+  public List<Kladronym> find(
+      Toponym toponym,
+      KladrCode scope,
+      ToponymMatch match,
+      Comparator<Kladronym> comparator
+  ) {
     return kladronyms.stream()
         .filter(candidate -> scope.contains(candidate.code()))
         .filter(candidate -> toponym.matches(candidate.toponym(), match))
-        .sorted()
+        .sorted(comparator)
         .toList();
   }
 }

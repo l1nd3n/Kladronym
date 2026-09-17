@@ -33,9 +33,9 @@ final class LikelyKladronymRegressionTest {
   private static List<String> resourceLines(String name) throws Exception {
     String resource = RESOURCE_ROOT + name;
     InputStream stream = LikelyKladronymRegressionTest.class.getResourceAsStream(resource);
-      if (stream == null) {
-          throw new AssertionError("Resource not found: " + resource);
-      }
+    if (stream == null) {
+      throw new AssertionError("Resource not found: " + resource);
+    }
     try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(stream, StandardCharsets.UTF_8)
     )) {

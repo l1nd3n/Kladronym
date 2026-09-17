@@ -79,18 +79,18 @@ public final class KladrCode {
    * @throws IllegalStateException if the code has no significant level
    */
   public KladrRank rank() {
-      if (lc > 0) {
-          return KladrRank.LOCALITY;
-      }
-      if (cc > 0) {
-          return KladrRank.CITY;
-      }
-      if (dc > 0) {
-          return KladrRank.DISTRICT;
-      }
-      if (rc > 0) {
-          return KladrRank.REGION;
-      }
+    if (lc > 0) {
+      return KladrRank.LOCALITY;
+    }
+    if (cc > 0) {
+      return KladrRank.CITY;
+    }
+    if (dc > 0) {
+      return KladrRank.DISTRICT;
+    }
+    if (rc > 0) {
+      return KladrRank.REGION;
+    }
     throw new IllegalStateException("KLADR code has no rank: " + this);
   }
 
@@ -122,17 +122,17 @@ public final class KladrCode {
    * @return {@code true} if the other code belongs to a lower level of this branch
    */
   public boolean contains(KladrCode other) {
-      if (other.equals(ROOT)) {
-          return false;
-      }
-      if (equals(ROOT)) {
-          return true;
-      }
+    if (other.equals(ROOT)) {
+      return false;
+    }
+    if (equals(ROOT)) {
+      return true;
+    }
     KladrRank thisRank = rank();
     KladrRank otherRank = other.rank();
-      if (otherRank.compareTo(thisRank) <= 0) {
-          return false;
-      }
+    if (otherRank.compareTo(thisRank) <= 0) {
+      return false;
+    }
     return switch (thisRank) {
       case REGION -> rc == other.rc;
       case DISTRICT -> rc == other.rc && dc == other.dc;
@@ -143,12 +143,12 @@ public final class KladrCode {
 
   @Override
   public boolean equals(Object other) {
-      if (this == other) {
-          return true;
-      }
-      if (!(other instanceof KladrCode code)) {
-          return false;
-      }
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof KladrCode code)) {
+      return false;
+    }
     return rc == code.rc && dc == code.dc && cc == code.cc && lc == code.lc;
   }
 

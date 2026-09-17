@@ -24,9 +24,9 @@ public final class SocrSource implements FiasSource<Abbreviations> {
   public Abbreviations load() throws Exception {
     try (var reader = new BufferedReader(input.load())) {
       String header = reader.readLine();
-        if (!"scname\tsocrname".equals(header)) {
-            throw new IOException("Unexpected SOCR header: " + header);
-        }
+      if (!"scname\tsocrname".equals(header)) {
+        throw new IOException("Unexpected SOCR header: " + header);
+      }
       Map<String, Set<String>> meanings = new LinkedHashMap<>();
       Map<String, String> spellings = new LinkedHashMap<>();
       Map<String, String> shortNames = new LinkedHashMap<>();
@@ -44,9 +44,9 @@ public final class SocrSource implements FiasSource<Abbreviations> {
         }
       }
       meanings.forEach((spelling, names) -> {
-          if (names.size() == 1) {
-              spellings.put(spelling, shortNames.get(names.iterator().next()));
-          }
+        if (names.size() == 1) {
+          spellings.put(spelling, shortNames.get(names.iterator().next()));
+        }
       });
       return new Abbreviations(meanings, spellings);
     }

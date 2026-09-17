@@ -13,9 +13,9 @@ public final class CachedSource<T> implements FiasSource<T> {
   public T load() throws Exception {
     if (cache == null) {
       synchronized (this) {
-          if (cache == null) {
-              cache = origin.load();
-          }
+        if (cache == null) {
+          cache = origin.load();
+        }
       }
     }
     return cache;

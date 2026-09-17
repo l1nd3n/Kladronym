@@ -21,9 +21,9 @@ public final class KladrSource implements FiasSource<Kladr> {
   public Kladr load() throws Exception {
     try (var reader = new BufferedReader(input.load())) {
       String header = reader.readLine();
-        if (!"name\tsocr\tcode".equals(header)) {
-            throw new IOException("Unexpected KLADR header: " + header);
-        }
+      if (!"name\tsocr\tcode".equals(header)) {
+        throw new IOException("Unexpected KLADR header: " + header);
+      }
       return new Kladr(reader.lines()
           .map(line -> line.split("\t", -1))
           .map(columns -> new Kladronym(

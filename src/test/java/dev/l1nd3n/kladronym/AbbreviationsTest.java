@@ -88,9 +88,9 @@ final class AbbreviationsTest {
       boolean allReady = ready.await(5, java.util.concurrent.TimeUnit.SECONDS);
       start.countDown();
       assertTrue(allReady);
-        for (var task : tasks) {
-            assertEquals(new TypeMatch("г.о.", 2), task.get());
-        }
+      for (var task : tasks) {
+        assertEquals(new TypeMatch("г.о.", 2), task.get());
+      }
     } finally {
       start.countDown();
     }

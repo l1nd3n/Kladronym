@@ -57,12 +57,12 @@ final class SourcesTest {
     assertEquals(0, calls.get());
     try (var executor = Executors.newFixedThreadPool(8)) {
       var results = new ArrayList<java.util.concurrent.Future<Object>>();
-        for (int index = 0; index < 32; index++) {
-            results.add(executor.submit(cached::load));
-        }
-        for (var result : results) {
-            assertSame(value, result.get());
-        }
+      for (int index = 0; index < 32; index++) {
+        results.add(executor.submit(cached::load));
+      }
+      for (var result : results) {
+        assertSame(value, result.get());
+      }
     }
     assertEquals(1, calls.get());
     var otherValue = new Object();
@@ -74,9 +74,9 @@ final class SourcesTest {
     var calls = new AtomicInteger();
     var failure = new IOException("unavailable");
     var cached = new CachedSource<Abbreviations>(() -> {
-        if (calls.incrementAndGet() == 1) {
-            throw failure;
-        }
+      if (calls.incrementAndGet() == 1) {
+        throw failure;
+      }
       return new Abbreviations(Map.of("г", Set.of("Город")));
     });
     var kladr = new Kladr(
